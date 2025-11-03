@@ -1,16 +1,34 @@
-import { useState } from "react";
-import { Menu, X, Mountain } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, X, Mountain, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/");
+  };
 
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "Explore", href: "#explore" },
-    { name: "Adventures", href: "#adventures" },
     { name: "Blog", href: "/blog" },
-    { name: "About", href: "#about" },
   ];
 
   return (
@@ -26,21 +44,27 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
-                href={link.href}
+                to={link.href}
                 className="text-foreground/80 hover:text-foreground transition-colors duration-200 font-medium"
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
-          </div>
-
-          {/* CTA Button */}
-          <div className="hidden md:block">
-            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-              Get Started
-            </Button>
+            
+            {user ? (
+              <Button onClick={handleSignOut} variant="outline" size="sm">
+                Sign Out
+              </Button>
+            ) : (
+              <Link to="/auth">
+                <Button variant="outline" size="sm">
+                  <User className="h-4 w-4 mr-2" />
+                  Login
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -58,18 +82,30 @@ const Navbar = () => {
         {isOpen && (
           <div className="md:hidden py-4 space-y-4">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
-                href={link.href}
+                to={link.href}
                 className="block text-foreground/80 hover:text-foreground transition-colors duration-200 font-medium py-2"
                 onClick={() => setIsOpen(false)}
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
-            <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-              Get Started
-            </Button>
+            
+            <div className="pt-2">
+              {user ? (
+                <Button onClick={handleSignOut} variant="outline" size="sm" className="w-full">
+                  Sign Out
+                </Button>
+              ) : (
+                <Link to="/auth">
+                  <Button variant="outline" size="sm" className="w-full">
+                    <User className="h-4 w-4 mr-2" />
+                    Login
+                  </Button>
+                </Link>
+              )}
+            </div>
           </div>
         )}
       </div>
