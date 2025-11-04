@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 
 const blogPosts = [
@@ -75,32 +76,34 @@ const Blog = () => {
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogPosts.map((post) => (
-              <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
-                <div className="relative h-48 overflow-hidden">
-                  <img 
-                    src={post.image} 
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
-                    {post.category}
-                  </Badge>
-                </div>
-                <CardHeader>
-                  <CardTitle className="text-xl hover:text-primary transition-colors">
-                    {post.title}
-                  </CardTitle>
-                  <CardDescription className="text-sm text-muted-foreground">
-                    {post.date}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-foreground/80">{post.excerpt}</p>
-                  <button className="mt-4 text-primary hover:text-primary/80 font-medium transition-colors">
-                    Read More →
-                  </button>
-                </CardContent>
-              </Card>
+              <Link key={post.id} to={`/blog/${post.id}`}>
+                <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 group h-full">
+                  <div className="relative h-48 overflow-hidden">
+                    <img 
+                      src={post.image} 
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
+                      {post.category}
+                    </Badge>
+                  </div>
+                  <CardHeader>
+                    <CardTitle className="text-xl hover:text-primary transition-colors">
+                      {post.title}
+                    </CardTitle>
+                    <CardDescription className="text-sm text-muted-foreground">
+                      {post.date}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-foreground/80">{post.excerpt}</p>
+                    <span className="mt-4 inline-block text-primary hover:text-primary/80 font-medium transition-colors">
+                      Read More →
+                    </span>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
