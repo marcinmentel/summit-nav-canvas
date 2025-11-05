@@ -1,8 +1,12 @@
 import { useParams, Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Heart, Send } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
 
 const blogPosts = [
   {
@@ -106,6 +110,124 @@ const blogPosts = [
 const BlogPost = () => {
   const { id } = useParams();
   const post = blogPosts.find((p) => p.id === Number(id));
+  const { toast } = useToast();
+  
+  const [user, setUser] = useState<any>(null);
+  const [likes, setLikes] = useState(0);
+  const [isLiked, setIsLiked] = useState(false);
+  const [comments, setComments] = useState<any[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (id) {
+      fetchLikes();
+      fetchComments();
+    }
+  }, [id, user]);
+
+  const fetchLikes = async () => {
+    const { count } = await supabase
+      .from("post_likes")
+      .select("*", { count: "exact", head: true })
+      .eq("post_id", id);
+    
+    setLikes(count || 0);
+
+    if (user) {
+      const { data } = await supabase
+        .from("post_likes")
+        .select("id")
+        .eq("post_id", id)
+        .eq("user_id", user.id)
+        .maybeSingle();
+      
+      setIsLiked(!!data);
+    }
+  };
+
+  const fetchComments = async () => {
+    const { data } = await supabase
+      .from("post_comments")
+      .select("*")
+      .eq("post_id", id)
+      .order("created_at", { ascending: false });
+    
+    setComments(data || []);
+  };
+
+  const handleLike = async () => {
+    if (!user) {
+      toast({
+        title: "Login required",
+        description: "Please login to like posts",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (isLiked) {
+      await supabase
+        .from("post_likes")
+        .delete()
+        .eq("post_id", id)
+        .eq("user_id", user.id);
+      setIsLiked(false);
+      setLikes(likes - 1);
+    } else {
+      await supabase
+        .from("post_likes")
+        .insert({ post_id: id, user_id: user.id });
+      setIsLiked(true);
+      setLikes(likes + 1);
+    }
+  };
+
+  const handleSubmitComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!user) {
+      toast({
+        title: "Login required",
+        description: "Please login to comment",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!newComment.trim()) return;
+
+    setIsSubmitting(true);
+    const { error } = await supabase
+      .from("post_comments")
+      .insert({
+        post_id: id,
+        user_id: user.id,
+        content: newComment.trim(),
+      });
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to post comment",
+        variant: "destructive",
+      });
+    } else {
+      setNewComment("");
+      fetchComments();
+      toast({
+        title: "Success",
+        description: "Comment posted successfully",
+      });
+    }
+    setIsSubmitting(false);
+  };
 
   if (!post) {
     return (
@@ -163,10 +285,27 @@ const BlogPost = () => {
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-4xl">
           {/* Excerpt */}
-          <div className="bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 rounded-2xl p-8 mb-12 border border-border/50">
-            <p className="text-xl text-foreground leading-relaxed italic">
+          <div className="bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 rounded-2xl p-8 mb-8 border border-border/50">
+            <p className="text-xl text-foreground leading-relaxed">
               {post.excerpt}
             </p>
+          </div>
+
+          {/* Likes Section */}
+          <div className="flex items-center gap-4 py-6 mb-12 border-y border-border/50">
+            <button
+              onClick={handleLike}
+              className="group flex items-center gap-2 transition-all hover:scale-110"
+            >
+              <Heart
+                className={`w-7 h-7 transition-all ${
+                  isLiked
+                    ? "fill-red-500 text-red-500"
+                    : "text-muted-foreground group-hover:text-red-500"
+                }`}
+              />
+              <span className="text-sm font-medium">{likes} {likes === 1 ? 'like' : 'likes'}</span>
+            </button>
           </div>
 
           {/* Main Content */}
@@ -198,19 +337,68 @@ const BlogPost = () => {
             </div>
           </div>
 
-          {/* CTA Section */}
-          <div className="bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 rounded-2xl p-12 text-center border border-border/50">
-            <h3 className="text-2xl font-bold text-foreground mb-4">
-              Ready to Start Your Adventure?
-            </h3>
-            <p className="text-muted-foreground mb-8 text-lg">
-              Explore more inspiring stories and guides from the mountains
-            </p>
-            <Link to="/blog">
-              <Button size="lg" className="font-semibold">
-                View All Posts
+          {/* Comments Section */}
+          <div className="space-y-8">
+            <h2 className="text-3xl font-bold text-foreground">Comments</h2>
+            
+            {/* Add Comment Form */}
+            <form onSubmit={handleSubmitComment} className="space-y-4">
+              <Textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder={user ? "Write a comment..." : "Login to comment"}
+                disabled={!user || isSubmitting}
+                className="min-h-[120px] resize-none"
+              />
+              <Button type="submit" disabled={!user || isSubmitting || !newComment.trim()} className="gap-2">
+                <Send className="w-4 h-4" />
+                Post Comment
               </Button>
-            </Link>
+              {!user && (
+                <p className="text-sm text-muted-foreground">
+                  Please <Link to="/auth" className="text-primary hover:underline">login</Link> to leave a comment
+                </p>
+              )}
+            </form>
+
+            {/* Comments List */}
+            <div className="space-y-6">
+              {comments.length === 0 ? (
+                <div className="text-center py-12 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl border border-border/50">
+                  <p className="text-muted-foreground">
+                    No comments yet. Be the first to comment!
+                  </p>
+                </div>
+              ) : (
+                comments.map((comment) => (
+                  <div
+                    key={comment.id}
+                    className="bg-gradient-to-r from-primary/5 to-transparent p-6 rounded-xl border border-primary/10 hover:border-primary/20 transition-colors"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                        <span className="text-sm font-semibold text-primary">
+                          {comment.user_id.substring(0, 2).toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="font-semibold text-sm text-foreground">Anonymous User</span>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(comment.created_at).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric'
+                            })}
+                          </span>
+                        </div>
+                        <p className="text-foreground/80 leading-relaxed">{comment.content}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
       </section>
