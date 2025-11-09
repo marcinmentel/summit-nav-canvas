@@ -8,40 +8,40 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 210 20% 18%;
-    --foreground: 210 30% 92%;
+    --background: 210 100% 97%;
+    --foreground: 210 30% 25%;
 
-    --card: 210 20% 22%;
-    --card-foreground: 210 30% 92%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 30% 25%;
 
-    --popover: 210 20% 22%;
-    --popover-foreground: 210 30% 92%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 30% 25%;
 
     --primary: 195 85% 65%;
-    --primary-foreground: 210 20% 18%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 160 50% 45%;
-    --secondary-foreground: 210 30% 92%;
+    --secondary: 160 60% 75%;
+    --secondary-foreground: 210 30% 25%;
 
-    --muted: 210 20% 28%;
-    --muted-foreground: 210 20% 65%;
+    --muted: 210 40% 92%;
+    --muted-foreground: 210 20% 50%;
 
-    --accent: 25 70% 55%;
-    --accent-foreground: 210 30% 92%;
+    --accent: 25 90% 80%;
+    --accent-foreground: 210 30% 25%;
 
-    --destructive: 0 60% 50%;
-    --destructive-foreground: 210 30% 92%;
+    --destructive: 0 70% 70%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 210 20% 32%;
-    --input: 210 20% 32%;
+    --border: 210 30% 88%;
+    --input: 210 30% 88%;
     --ring: 195 85% 65%;
 
     --radius: 0.75rem;
     
     /* Mountain theme gradients */
-    --gradient-sky: linear-gradient(180deg, hsl(210 20% 24%) 0%, hsl(195 60% 30%) 100%);
-    --gradient-mountain: linear-gradient(135deg, hsl(160 50% 35%) 0%, hsl(195 60% 40%) 100%);
-    --gradient-hero: linear-gradient(180deg, hsl(210 20% 18%) 0%, hsl(195 60% 25%) 50%, hsl(160 50% 30%) 100%);
+    --gradient-sky: linear-gradient(180deg, hsl(210 100% 92%) 0%, hsl(195 85% 88%) 100%);
+    --gradient-mountain: linear-gradient(135deg, hsl(160 60% 75%) 0%, hsl(195 85% 75%) 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(210 100% 97%) 0%, hsl(195 85% 90%) 50%, hsl(160 60% 85%) 100%);
 
     --sidebar-background: 0 0% 98%;
 

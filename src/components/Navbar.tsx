@@ -3,6 +3,7 @@ import { Menu, X, Mountain, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,7 +43,7 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-4">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
@@ -52,6 +53,8 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
+            
+            <ThemeToggle />
             
             {user ? (
               <Button onClick={handleSignOut} variant="outline" size="sm">
@@ -92,7 +95,9 @@ const Navbar = () => {
               </Link>
             ))}
             
-            <div className="pt-2">
+            <div className="pt-2 space-y-2">
+              <ThemeToggle />
+              
               {user ? (
                 <Button onClick={handleSignOut} variant="outline" size="sm" className="w-full">
                   Sign Out
