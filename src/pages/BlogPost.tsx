@@ -1,7 +1,8 @@
 import { useParams, Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Heart, Send } from "lucide-react";
+import { ArrowLeft, Heart, Send, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -118,6 +119,11 @@ const BlogPost = () => {
   const [comments, setComments] = useState<any[]>([]);
   const [newComment, setNewComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  // Combine hero image and gallery images
+  const allImages = post ? [post.image, ...post.gallery] : [];
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -229,6 +235,19 @@ const BlogPost = () => {
     setIsSubmitting(false);
   };
 
+  const openLightbox = (index: number) => {
+    setCurrentImageIndex(index);
+    setLightboxOpen(true);
+  };
+
+  const goToPrevious = () => {
+    setCurrentImageIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
+  };
+
+  const goToNext = () => {
+    setCurrentImageIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
+  };
+
   if (!post) {
     return (
       <div className="min-h-screen">
@@ -252,7 +271,7 @@ const BlogPost = () => {
       
       {/* Hero Section with Large Image */}
       <section className="relative h-[60vh] min-h-[500px] overflow-hidden">
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 cursor-pointer" onClick={() => openLightbox(0)}>
           <img 
             src={post.image} 
             alt={post.title}
@@ -324,7 +343,8 @@ const BlogPost = () => {
               {post.gallery.map((image, index) => (
                 <div 
                   key={index} 
-                  className="relative overflow-hidden rounded-xl aspect-video group"
+                  className="relative overflow-hidden rounded-xl aspect-video group cursor-pointer"
+                  onClick={() => openLightbox(index + 1)}
                 >
                   <img 
                     src={image} 
@@ -402,6 +422,51 @@ const BlogPost = () => {
           </div>
         </div>
       </section>
+
+      {/* Lightbox Dialog */}
+      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+        <DialogContent className="max-w-7xl w-full h-[90vh] p-0 bg-black/95 border-none">
+          <div className="relative w-full h-full flex items-center justify-center">
+            {/* Close button */}
+            <button
+              onClick={() => setLightboxOpen(false)}
+              className="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            >
+              <X className="w-6 h-6 text-white" />
+            </button>
+
+            {/* Previous button */}
+            <button
+              onClick={goToPrevious}
+              className="absolute left-4 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            >
+              <ChevronLeft className="w-8 h-8 text-white" />
+            </button>
+
+            {/* Image */}
+            <img
+              src={allImages[currentImageIndex]}
+              alt={`${post.title} - Image ${currentImageIndex + 1}`}
+              className="max-w-full max-h-full object-contain"
+            />
+
+            {/* Next button */}
+            <button
+              onClick={goToNext}
+              className="absolute right-4 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            >
+              <ChevronRight className="w-8 h-8 text-white" />
+            </button>
+
+            {/* Image counter */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm">
+              <span className="text-white text-sm font-medium">
+                {currentImageIndex + 1} / {allImages.length}
+              </span>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
