@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
-
+import { usePostQuery } from "@/hooks/usePosts";
 const blogPosts = [
   {
     id: 1,
@@ -101,9 +101,13 @@ const blogPosts = [
 
     These retreats blend the healing power of nature with expert guidance in wellness practices, offering a transformative experience that stays with you long after you return to daily life.`,
     gallery: [
-      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80",
-      "https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=80",
-      "https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800&q=80"
+      "https://poweredazureblob.blob.core.windows.net/photocontainer/IMG_2012_800x600.jpeg",
+      "https://poweredazureblob.blob.core.windows.net/photocontainer/IMG_5233_800x600.jpeg",
+      "https://poweredazureblob.blob.core.windows.net/photocontainer/IMG_4325_800x600.jpeg",
+      "https://poweredazureblob.blob.core.windows.net/photocontainer/IMG_5184_800x600.jpeg",
+      "https://poweredazureblob.blob.core.windows.net/photocontainer/IMG_1971_800x600.jpeg",
+      "https://poweredazureblob.blob.core.windows.net/photocontainer/IMG_2273_800x600.jpeg",
+      "https://poweredazureblob.blob.core.windows.net/photocontainer/IMG_5265_800x600.jpeg"
     ]
   }
 ];

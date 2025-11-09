@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-
+import { usePostsQuery } from "@/hooks/usePosts";
 const blogPosts = [
   {
     id: 1,
@@ -42,7 +42,7 @@ const blogPosts = [
     excerpt: "Essential safety guidelines for winter mountain adventures and cold weather hiking.",
     date: "February 20, 2024",
     category: "Safety",
-    image: "https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800&q=80"
+    image: "https://poweredazureblob.blob.core.windows.net/photocontainer/IMG_4325_800x600.jpeg"
   },
   {
     id: 6,
@@ -50,11 +50,26 @@ const blogPosts = [
     excerpt: "Rejuvenate your mind and body with peaceful mountain retreats focused on wellness and tranquility.",
     date: "February 15, 2024",
     category: "Wellness",
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80"
+    image: "https://poweredazureblob.blob.core.windows.net/photocontainer/IMG_5233_800x600.jpeg"
   }
 ];
 
 const Blog = () => {
+  const { data: blogPostsApi, isLoading, isError } = usePostsQuery();
+  console.log(blogPostsApi);
+  if (isLoading)
+    return (
+      <div className="min-h-screen flex justify-center items-center text-lg text-muted-foreground">
+        Loading blog posts...
+      </div>
+    );
+
+  if (isError)
+    return (
+      <div className="min-h-screen flex justify-center items-center text-red-500">
+        Failed to load blog posts.
+      </div>
+    );
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -75,17 +90,18 @@ const Blog = () => {
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {blogPosts.map((post) => (
+            {blogPostsApi.map((post) => (
               <Link key={post.id} to={`/blog/${post.id}`}>
                 <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 group h-full">
                   <div className="relative h-48 overflow-hidden">
                     <img 
-                      src={post.image} 
+                      src={post.featuredImage.url} 
                       alt={post.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
-                      {post.category}
+                      {/*poprawić category {post.category}*/}
+                      "Running"
                     </Badge>
                   </div>
                   <CardHeader>
@@ -93,7 +109,7 @@ const Blog = () => {
                       {post.title}
                     </CardTitle>
                     <CardDescription className="text-sm text-muted-foreground">
-                      {post.date}
+                      {post.createdAt}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
