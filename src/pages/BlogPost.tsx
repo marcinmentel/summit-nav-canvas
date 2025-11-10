@@ -115,6 +115,9 @@ const blogPosts = [
 const BlogPost = () => {
   const { id } = useParams();
   const post = blogPosts.find((p) => p.id === Number(id));
+  const { data: onepost, isLoading, isError } = usePostQuery(Number(id));
+  console.log('onepost: ', onepost);
+
   const { toast } = useToast();
   
   const [user, setUser] = useState<any>(null);
