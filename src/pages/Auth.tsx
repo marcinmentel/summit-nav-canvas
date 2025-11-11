@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { Mountain } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import Navbar from "@/components/Navbar";
 
 const authSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }).max(255),
@@ -137,8 +138,10 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-mountain flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-gradient-to-b from-background/80 to-background/95" />
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-gradient-mountain flex items-center justify-center p-4 pt-24">
+        <div className="absolute inset-0 bg-gradient-to-b from-background/80 to-background/95" />
       
       <Card className="w-full max-w-md relative z-10 border-primary/20 shadow-xl">
         <CardHeader className="space-y-4 text-center">
@@ -320,7 +323,8 @@ const Auth = () => {
           </Tabs>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   );
 };
 
