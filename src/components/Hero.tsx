@@ -30,10 +30,12 @@ const Hero = () => {
             </span>
           </h1>
 
-          <p className="text-xl text-foreground/70 max-w-2xl mx-auto leading-relaxed">
-            Experience breathtaking peaks, serene valleys, and unforgettable moments.
-            Your journey to the summit begins here.
-          </p>
+          <div className="max-w-2xl mx-auto">
+            <blockquote className="text-xl text-foreground/70 leading-relaxed italic">
+              "The mountains are calling and I must go."
+            </blockquote>
+            <p className="text-lg text-foreground/60 mt-4">— John Muir</p>
+          </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground group">
