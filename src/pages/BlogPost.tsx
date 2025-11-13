@@ -15,7 +15,7 @@ const blogPosts = [
     title: "Exploring the Alpine Peaks",
     excerpt: "Discover the breathtaking beauty of mountain ranges and learn essential tips for your next alpine adventure.",
     date: "March 15, 2024",
-    category: "Adventure",
+    categories: ["Adventure", "Hiking"],
     image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
     content: `The Alpine peaks have captivated adventurers for centuries with their majestic beauty and challenging terrain. Standing atop these magnificent mountains offers a perspective that transforms how we see the world and ourselves.
 
@@ -31,7 +31,7 @@ const blogPosts = [
     title: "Mountain Photography Guide",
     excerpt: "Master the art of capturing stunning mountain landscapes with these professional photography techniques.",
     date: "March 10, 2024",
-    category: "Photography",
+    categories: ["Photography", "Adventure"],
     image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80",
     content: `Capturing the perfect mountain photograph requires more than just pointing your camera at a beautiful view. It's about understanding light, composition, and the unique challenges that high-altitude environments present.
 
@@ -47,7 +47,7 @@ const blogPosts = [
     title: "Best Hiking Trails for Beginners",
     excerpt: "Start your hiking journey with these beginner-friendly trails that offer spectacular mountain views.",
     date: "March 5, 2024",
-    category: "Hiking",
+    categories: ["Hiking", "Adventure"],
     image: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=80",
     content: `Starting your hiking journey doesn't mean you have to miss out on spectacular views. These carefully selected beginner trails offer the perfect introduction to mountain hiking while showcasing some of nature's most beautiful landscapes.
 
@@ -63,7 +63,7 @@ const blogPosts = [
     title: "Sustainable Mountain Tourism",
     excerpt: "Learn how to explore mountains responsibly and minimize your environmental impact.",
     date: "February 28, 2024",
-    category: "Environment",
+    categories: ["Environment", "Hiking"],
     image: "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&q=80",
     content: `Our mountains are precious ecosystems that require careful stewardship. Sustainable mountain tourism isn't just a trend—it's a responsibility we all share to preserve these natural wonders for future generations.
 
@@ -288,9 +288,13 @@ const BlogPost = () => {
             </Button>
           </Link>
           
-          <Badge className="w-fit mb-4 bg-primary text-primary-foreground">
-            {post.category}
-          </Badge>
+          <div className="flex flex-wrap gap-2 mb-4">
+            {post.categories.map((category, index) => (
+              <Badge key={index} className="bg-primary text-primary-foreground">
+                {category}
+              </Badge>
+            ))}
+          </div>
           
           <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-4 drop-shadow-lg">
             {post.title}
