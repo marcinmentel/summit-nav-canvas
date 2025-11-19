@@ -39,8 +39,10 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex items-center gap-2">
             <Mountain className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Powered By Trail
+            <span className="text-xl font-bold">
+              <span className="text-trail-green">Powered</span>{" "}
+              <span className="text-trail-brown">By</span>{" "}
+              <span className="text-trail-blue">Trail</span>
             </span>
           </div>
 
