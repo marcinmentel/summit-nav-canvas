@@ -37,13 +37,10 @@ const Navbar = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center gap-2 group">
-            <Mountain className="h-8 w-8 text-primary drop-shadow-lg transition-transform group-hover:scale-110" />
-            <span className="text-2xl font-bebas tracking-wider text-foreground drop-shadow-md relative">
-              POWERED BY
-              <span className="block text-3xl bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-pulse">
-                TRAIL
-              </span>
+          <div className="flex items-center gap-2">
+            <Mountain className="h-8 w-8 text-primary" />
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Powered By Trail
             </span>
           </div>
 
