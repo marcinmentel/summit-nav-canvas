@@ -39,7 +39,9 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex items-center gap-2">
             <Mountain className="h-8 w-8 text-primary" />
-            <span className="text-xl font-semibold text-foreground">PeakView</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Powered By Trail
+            </span>
           </div>
 
           {/* Desktop Navigation */}
