@@ -57,6 +57,11 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        trail: {
+          green: "hsl(var(--trail-green))",
+          brown: "hsl(var(--trail-brown))",
+          blue: "hsl(var(--trail-blue))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
