@@ -91,18 +91,17 @@ const Blog = () => {
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogPostsApi.map((post) => (
-              // <Link key={post.id} to={`/blog/${post.id}`}>
-              <Link key={post.slug} to={`/blog/${post.slug}`}>
+              <Link key={post.id} to={`/blog/${post.id}`}>
                 <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 group h-full">
                   <div className="relative h-48 overflow-hidden">
                     <img 
-                      src={post.featuredImage.toString()} 
+                      src={post.featuredImage.url} 
                       alt={post.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
                       {/*poprawić category {post.category}*/}
-                      {post.postTags[0]}
+                      "Running"
                     </Badge>
                   </div>
                   <CardHeader>
