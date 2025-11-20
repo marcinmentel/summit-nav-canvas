@@ -38,8 +38,13 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <Mountain className="h-8 w-8 text-primary" />
-            <span className="text-xl font-semibold text-foreground">PeakView</span>
+            <img
+              src= "https://poweredbytrailstorage.blob.core.windows.net/pbtgallery/ICON300.png"
+              alt="PBT icon"
+              className="h-8 w-8" />
+             <span className="text-xl font-bold bg-gradient-to-r from-trail-green via-trail-brown to-trail-blue bg-clip-text  text-transparent">
+                Powered By Trail
+              </span>
           </div>
 
           {/* Desktop Navigation */}
