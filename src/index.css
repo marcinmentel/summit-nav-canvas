@@ -38,11 +38,6 @@ All colors MUST be HSL.
 
     --radius: 0.75rem;
     
-    /* Trail branding colors */
-    --trail-green: 145 60% 55%;
-    --trail-brown: 25 45% 50%;
-    --trail-blue: 200 70% 60%;
-    
     /* Mountain theme gradients */
     --gradient-sky: linear-gradient(180deg, hsl(210 100% 92%) 0%, hsl(195 85% 88%) 100%);
     --gradient-mountain: linear-gradient(135deg, hsl(160 60% 75%) 0%, hsl(195 85% 75%) 100%);
@@ -93,11 +88,6 @@ All colors MUST be HSL.
     --border: 210 30% 25%;
     --input: 210 30% 25%;
     --ring: 195 85% 65%;
-    
-    /* Trail branding colors - dark mode */
-    --trail-green: 145 50% 65%;
-    --trail-brown: 25 50% 60%;
-    --trail-blue: 200 65% 70%;
     
     --gradient-sky: linear-gradient(180deg, hsl(210 30% 18%) 0%, hsl(195 60% 25%) 100%);
     --gradient-mountain: linear-gradient(135deg, hsl(160 40% 30%) 0%, hsl(195 60% 35%) 100%);
