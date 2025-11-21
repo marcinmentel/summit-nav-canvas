@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Heart, Send, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -316,19 +317,30 @@ const BlogPost = () => {
 
           {/* Likes Section */}
           <div className="flex items-center gap-4 py-6 mb-12 border-y border-border/50">
-            <button
-              onClick={handleLike}
-              className="group flex items-center gap-2 transition-all hover:scale-110"
-            >
-              <Heart
-                className={`w-7 h-7 transition-all ${
-                  isLiked
-                    ? "fill-red-500 text-red-500"
-                    : "text-muted-foreground group-hover:text-red-500"
-                }`}
-              />
-              <span className="text-sm font-medium">{likes} {likes === 1 ? 'like' : 'likes'}</span>
-            </button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={handleLike}
+                    className="group flex items-center gap-2 transition-all hover:scale-110"
+                  >
+                    <Heart
+                      className={`w-7 h-7 transition-all ${
+                        isLiked
+                          ? "fill-red-500 text-red-500"
+                          : "text-muted-foreground group-hover:text-red-500"
+                      }`}
+                    />
+                    <span className="text-sm font-medium">{likes} {likes === 1 ? 'like' : 'likes'}</span>
+                  </button>
+                </TooltipTrigger>
+                {!user && (
+                  <TooltipContent>
+                    <p>Login required to like</p>
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
           </div>
 
           {/* Main Content */}
