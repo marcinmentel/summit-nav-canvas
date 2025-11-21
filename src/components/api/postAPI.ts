@@ -6,12 +6,12 @@ export interface BlogPost {
   excerpt: string;
   content: string;
   createdAt: string;
-  slug: string;
+  
   featuredImageId: number;
-  featuredImage: string; // Pełny obiekt obrazu
+  featuredImage: Image; // Pełny obiekt obrazu
 
-  postTags: string[];
-  galleryImages: string[];
+  postTags: Tag[];
+  galleryImages: Image[];
 }
 
 export const getAllPosts = async (): Promise<BlogPost[]> => {
@@ -21,10 +21,6 @@ export const getAllPosts = async (): Promise<BlogPost[]> => {
 
 export const getPostById = async (id: number): Promise<BlogPost> => {
   const res = await apiClient.get(`/api/Posts/ById/${id}`);
-  return res.data;
-};
-export const getPostBySlug = async (slug: string): Promise<BlogPost> => {
-  const res = await apiClient.get(`/api/Posts/${slug}`);
   return res.data;
 };
 export interface Image {
