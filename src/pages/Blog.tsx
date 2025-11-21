@@ -9,7 +9,7 @@ const blogPosts = [
     id: 1,
     title: "Exploring the Alpine Peaks",
     excerpt: "Discover the breathtaking beauty of mountain ranges and learn essential tips for your next alpine adventure.",
-    date: "March 15, 2024",
+    date: "November 20, 2025",
     categories: ["Adventure", "Hiking"],
     image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80"
   },
