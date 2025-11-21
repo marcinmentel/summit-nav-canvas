@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAllPosts, getPostById } from "@/components/api/postAPI";
+import { getAllPosts, getPostById, getPostBySlug } from "@/components/api/postAPI";
 
 export const usePostsQuery = () => {
   return useQuery({
@@ -15,3 +15,10 @@ export const usePostQuery = (id: number) => {
     enabled: !!id, // tylko jeśli id istnieje
   });
 };
+export const usePostSlugQuery = (slug: string) => {
+    return useQuery({
+      queryKey: ["posts", slug],
+      queryFn: () => getPostBySlug(slug),
+      enabled: !!slug, // tylko jeśli id istnieje
+    });
+  };

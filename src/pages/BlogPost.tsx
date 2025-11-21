@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
-import { usePostQuery } from "@/hooks/usePosts";
+import { usePostQuery , usePostSlugQuery} from "@/hooks/usePosts";
 const blogPosts = [
   {
     id: 1,
@@ -113,10 +113,11 @@ const blogPosts = [
 ];
 
 const BlogPost = () => {
-  const { id } = useParams();
-  const post = blogPosts.find((p) => p.id === Number(id));
-  const { data: onepost, isLoading, isError } = usePostQuery(Number(id));
-  console.log('onepost: ', onepost);
+  const { slug } = useParams();
+  const { id } = useParams();// nie uzywane. tylko dla like, comment
+  //const post = blogPosts.find((p) => p.id === Number(id));
+  const { data: post, isLoading, isError } = usePostSlugQuery(String(slug));
+  console.log('onepost: ', post);
 
   const { toast } = useToast();
   
@@ -130,8 +131,8 @@ const BlogPost = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   // Combine hero image and gallery images
-  const allImages = post ? [post.image, ...post.gallery] : [];
-
+ // const allImages = post ? [post.image, ...post.gallery] : [];
+  const allImages = post ? [post.featuredImage, ...post.galleryImages] : [];
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
@@ -271,7 +272,19 @@ const BlogPost = () => {
       </div>
     );
   }
+  if (isLoading)
+    return (
+      <div className="min-h-screen flex justify-center items-center text-lg text-muted-foreground">
+        Loading blog posts...
+      </div>
+    );
 
+  if (isError)
+    return (
+      <div className="min-h-screen flex justify-center items-center text-red-500">
+        Failed to load blog posts.
+      </div>
+    );
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -280,7 +293,7 @@ const BlogPost = () => {
       <section className="relative h-[60vh] min-h-[500px] overflow-hidden">
         <div className="absolute inset-0 cursor-pointer" onClick={() => openLightbox(0)}>
           <img 
-            src={post.image} 
+            src={post.featuredImage} 
             alt={post.title}
             className="w-full h-full object-cover"
           />
@@ -295,15 +308,19 @@ const BlogPost = () => {
             </Button>
           </Link>
           
-          <Badge className="w-fit mb-4 bg-primary text-primary-foreground">
-            {post.category}
-          </Badge>
+          <div className="flex flex-wrap gap-2 mb-4">
+            {post.postTags.map((category, index) => (
+              <Badge key={index} className="bg-primary text-primary-foreground">
+                {category}
+              </Badge>
+            ))}
+          </div>
           
           <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-4 drop-shadow-lg">
             {post.title}
           </h1>
           
-          <p className="text-muted-foreground text-lg">{post.date}</p>
+          <p className="text-muted-foreground text-lg">{post.createdAt}</p>
         </div>
       </section>
 
@@ -347,7 +364,7 @@ const BlogPost = () => {
           <div className="mb-16">
             <h2 className="text-3xl font-bold text-foreground mb-8">Gallery</h2>
             <div className="grid md:grid-cols-2 gap-6">
-              {post.gallery.map((image, index) => (
+              {post.galleryImages.map((image, index) => (
                 <div 
                   key={index} 
                   className="relative overflow-hidden rounded-xl aspect-video group cursor-pointer"
