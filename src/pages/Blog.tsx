@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import { differenceInDays, parse } from "date-fns";
 
 const blogPosts = [
   {
@@ -55,17 +56,27 @@ const blogPosts = [
 ];
 
 const Blog = () => {
+  const isRecentPost = (dateString: string) => {
+    try {
+      const postDate = parse(dateString, "MMMM d, yyyy", new Date());
+      const today = new Date();
+      return differenceInDays(today, postDate) <= 6 && differenceInDays(today, postDate) >= 0;
+    } catch {
+      return false;
+    }
+  };
+
   return (
     <div className="min-h-screen">
       <Navbar />
       
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-4 bg-gradient-to-b from-background via-primary/5 to-background">
-        <div className="container mx-auto max-w-6xl">
+        <div className="container mx-auto max-w-6xl text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-4">
             Mountain Stories
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Explore our collection of adventures, guides, and inspiration from the peaks
           </p>
         </div>
@@ -85,6 +96,11 @@ const Blog = () => {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+                      {isRecentPost(post.date) && (
+                        <Badge className="bg-accent text-accent-foreground">
+                          New
+                        </Badge>
+                      )}
                       {post.categories.map((category, index) => (
                         <Badge key={index} className="bg-primary text-primary-foreground">
                           {category}
