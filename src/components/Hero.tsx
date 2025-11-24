@@ -1,6 +1,6 @@
 import { ArrowRight, Mountain } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
+import { Link, useNavigate } from "react-router-dom";
 const Hero = () => {
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -34,10 +34,12 @@ const Hero = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center ">
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground group">
-              Hit the trail
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
+            <Link to="/blog">
+              <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground group">
+                Hit my trails
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>              
           </div>
         </div>
       </div>

@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import { usePostQuery , usePostSlugQuery} from "@/hooks/usePosts";
+import {  format } from "date-fns";
 const blogPosts = [
   {
     id: 1,
@@ -320,7 +321,7 @@ const BlogPost = () => {
             {post.title}
           </h1>
           
-          <p className="text-muted-foreground text-lg">{post.createdAt}</p>
+          <p className="text-muted-foreground text-lg">{format(post.createdAt,"yyy-MM-dd")}</p>
         </div>
       </section>
 
