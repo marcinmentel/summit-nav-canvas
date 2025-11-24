@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { usePostsQuery } from "@/hooks/usePosts";
+import { differenceInDays, format } from "date-fns";
 const blogPosts = [
   {
     id: 1,
@@ -56,7 +57,15 @@ const blogPosts = [
 
 const Blog = () => {
   const { data: blogPostsApi, isLoading, isError } = usePostsQuery();
-  console.log(blogPostsApi);
+  
+  const isRecentPost = (dateString: string) => {
+    try {
+      const today = new Date();
+      return differenceInDays(today, dateString) <= 6 && differenceInDays(today, dateString) >= 0;
+    } catch {
+      return false;
+    }
+  };
   if (isLoading)
     return (
       <div className="min-h-screen flex justify-center items-center text-lg text-muted-foreground">
@@ -70,17 +79,18 @@ const Blog = () => {
         Failed to load blog posts.
       </div>
     );
+  console.log(blogPostsApi);
   return (
     <div className="min-h-screen">
       <Navbar />
       
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-4 bg-gradient-to-b from-background via-primary/5 to-background">
-        <div className="container mx-auto max-w-6xl">
+        <div className="container mx-auto max-w-6xl text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-4">
-            Mountain Stories
+            Historie trailem pisane
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Explore our collection of adventures, guides, and inspiration from the peaks
           </p>
         </div>
@@ -100,17 +110,24 @@ const Blog = () => {
                       alt={post.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
-                      {/*poprawić category {post.category}*/}
-                      {post.postTags[0]}
-                    </Badge>
+                    <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+                      {isRecentPost(post.createdAt) && (
+                          <Badge className="bg-accent text-accent-foreground">
+                            NEW
+                          </Badge>
+                        )}
+                      <Badge className="bg-primary text-primary-foreground">
+                        {/*poprawić category {post.category}*/}
+                        {post.postTags[0]}
+                      </Badge>
+                    </div>
                   </div>
                   <CardHeader>
                     <CardTitle className="text-xl hover:text-primary transition-colors">
                       {post.title}
                     </CardTitle>
                     <CardDescription className="text-sm text-muted-foreground">
-                      {post.createdAt}
+                      {format(post.createdAt,"yyy-MM-dd")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -130,3 +147,4 @@ const Blog = () => {
 };
 
 export default Blog;
+
