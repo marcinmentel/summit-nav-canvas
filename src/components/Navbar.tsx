@@ -4,23 +4,45 @@ import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState<{ display_name: string } | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserProfile(session.user.id);
+      } else {
+        setUserProfile(null);
+      }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserProfile(session.user.id);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const fetchUserProfile = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (!error && data) {
+      setUserProfile(data);
+    }
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -59,9 +81,19 @@ const Navbar = () => {
             <ThemeToggle />
             
             {user ? (
-              <Button onClick={handleSignOut} variant="outline" size="sm">
-                Sign Out
-              </Button>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      {userProfile?.display_name?.[0]?.toUpperCase() || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm font-medium">{userProfile?.display_name || "User"}</span>
+                </div>
+                <Button onClick={handleSignOut} variant="outline" size="sm">
+                  Sign Out
+                </Button>
+              </div>
             ) : (
               <Link to="/auth">
                 <Button variant="outline" size="sm">
@@ -101,9 +133,19 @@ const Navbar = () => {
               <ThemeToggle />
               
               {user ? (
-                <Button onClick={handleSignOut} variant="outline" size="sm" className="w-full">
-                  Sign Out
-                </Button>
+                <>
+                  <div className="flex items-center gap-2 py-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-primary/10 text-primary">
+                        {userProfile?.display_name?.[0]?.toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium">{userProfile?.display_name || "User"}</span>
+                  </div>
+                  <Button onClick={handleSignOut} variant="outline" size="sm" className="w-full">
+                    Sign Out
+                  </Button>
+                </>
               ) : (
                 <Link to="/auth">
                   <Button variant="outline" size="sm" className="w-full">
