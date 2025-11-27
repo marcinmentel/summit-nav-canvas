@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+//import { supabase } from "@/integrations/supabase/client";
+import { useForm } from 'react-hook-form';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,56 +9,42 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Mountain } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/Navbar";
+import { signInSchema, SignInCredentials , signUpSchema , SignUpCredentials} from '@/components/api/authAPI'; // Schemat
+import { useAuthLoginMutation } from '@/hooks/useAuth'; // Nowy hook
 
-const authSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }).max(255),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }).max(100),
-});
 
 const Auth = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  
   const navigate = useNavigate();
   const { toast } = useToast();
+  const loginMutation = useAuthLoginMutation();
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        navigate("/");
-      }
+
+  const {  
+      register: registerSignup,
+      handleSubmit: handleSubmitRegister,
+      formState: { errors: signupErrors },
+    } = useForm<SignUpCredentials>({
+      resolver: zodResolver(signUpSchema),
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        navigate("/");
-      }
+  const {
+      register: registerSignIn,
+      handleSubmit: handleSubmitLogin,
+      setError,
+      formState: { errors: signInErrors },
+    } = useForm<SignInCredentials>({
+      resolver: zodResolver(signInSchema),
     });
 
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
+  const handleSignUp =  (data: SignUpCredentials) => {
+      console.log("register");
     try {
-      const validatedData = authSchema.parse({ email, password });
-      const redirectUrl = `${window.location.origin}/`;
-
-      const { error } = await supabase.auth.signUp({
-        email: validatedData.email,
-        password: validatedData.password,
-        options: {
-          emailRedirectTo: redirectUrl,
-        },
-      });
-
-      if (error) throw error;
-
+      
       toast({
         title: "Success!",
         description: "Account created successfully. You can now log in.",
@@ -77,24 +64,29 @@ const Auth = () => {
         });
       }
     } finally {
-      setLoading(false);
+      //setLoading(false);
     }
   };
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
+  const handleSignIn =  (data: SignInCredentials) => {
+    console.log("login");
     try {
-      const validatedData = authSchema.parse({ email, password });
+      //const validatedData = authSchema.parse({ email, password });
 
-      const { error } = await supabase.auth.signInWithPassword({
-        email: validatedData.email,
-        password: validatedData.password,
-      });
-
-      if (error) throw error;
-
+      loginMutation.mutate(data, {
+        onError: (error) => {
+            // Obsługa konkretnego błędu ze strony serwera
+            setError("email", { 
+                type: "server", 
+                message: "Nieprawidłowy adres e-mail lub hasło." 
+            });
+            setError("password", { 
+                type: "server", 
+                message: "Sprawdź swoje dane logowania." 
+            });
+        }
+    });     
+      console.log("logged");
       toast({
         title: "Welcome back!",
         description: "Successfully logged in.",
@@ -114,27 +106,27 @@ const Auth = () => {
         });
       }
     } finally {
-      setLoading(false);
+      //setLoading(false);
     }
   };
 
   const handleSocialLogin = async (provider: 'google' | 'facebook') => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/`,
-        },
-      });
+    // try {
+    //   // const { error } = await supabase.auth.signInWithOAuth({
+    //   //   provider,
+    //   //   options: {
+    //   //     redirectTo: `${window.location.origin}/`,
+    //   //   },
+    //   // });
 
-      if (error) throw error;
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Login Failed",
-        description: error.message || `Failed to login with ${provider}`,
-      });
-    }
+    //   //if (error) throw error;
+    // } catch (error: any) {
+    //   toast({
+    //     variant: "destructive",
+    //     title: "Login Failed",
+    //     description: error.message || `Failed to login with ${provider}`,
+    //   });
+    // }
   };
 
   return (
@@ -166,17 +158,21 @@ const Auth = () => {
               </TabsList>
               
               <TabsContent value="login">
-                <form onSubmit={handleSignIn} className="space-y-4">
+                <form onSubmit={handleSubmitLogin(handleSignIn)}className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="login-email">Email</Label>
                     <Input
                       id="login-email"
                       type="email"
                       placeholder="your@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      //value={email}
+                      //onChange={(e) => setEmail(e.target.value)}
+                      {...registerSignIn("email")}
                       required
                     />
+                    {signInErrors.email && (
+                        <p className="text-red-500 text-sm">{signInErrors.email.message}</p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="login-password">Password</Label>
@@ -184,13 +180,17 @@ const Auth = () => {
                       id="login-password"
                       type="password"
                       placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      //value={password}
+                      //onChange={(e) => setPassword(e.target.value)}
+                      {...registerSignIn("password")}
                       required
                     />
+                    {signInErrors.password && (
+                        <p className="text-red-500 text-sm">{signInErrors.password.message}</p>
+                    )}
                   </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Logging in..." : "Login"}
+                  <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+                    {loginMutation.isPending ? "Logging in..." : "Login"}
                   </Button>
                 </form>
                 
@@ -244,15 +244,15 @@ const Auth = () => {
               </TabsContent>
               
               <TabsContent value="signup">
-                <form onSubmit={handleSignUp} className="space-y-4">
+                <form onSubmit={handleSubmitLogin(handleSignIn)} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
                     <Input
                       id="signup-email"
                       type="email"
                       placeholder="your@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      //value={email}
+                      //onChange={(e) => setEmail(e.target.value)}
                       required
                     />
                   </div>
@@ -262,13 +262,13 @@ const Auth = () => {
                       id="signup-password"
                       type="password"
                       placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      //value={password}
+                      //onChange={(e) => setPassword(e.target.value)}
                       required
                     />
                   </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Creating account..." : "Sign Up"}
+                  <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+                    {loginMutation.isPending ? "Creating account..." : "Sign Up"}
                   </Button>
                 </form>
                 
