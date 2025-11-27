@@ -17,7 +17,7 @@ const Navbar = () => {
   const { data: userProfile, isLoading, isError } = useCurrentUser();
   //const { user, isLoggedIn, isLoading } = useCurrentUser();
   console.log("getuser");
-  console.log(userProfile.displayName);
+  console.log(userProfile?.displayName);
 
   // useEffect(() => {
   //   const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -145,10 +145,10 @@ const Navbar = () => {
                   <div className="flex items-center gap-2 py-2">
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="bg-primary/10 text-primary">
-                        {userProfile?.DisplayName?.[0]?.toUpperCase() || "U"}
+                        {userProfile?.displayName?.[0]?.toUpperCase() || "U"}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-sm font-medium">{userProfile?.DisplayName || "User"}</span>
+                    <span className="text-sm font-medium">{userProfile?.displayName || "User"}</span>
                   </div>
                   <Button onClick={handleSignOut} variant="outline" size="sm" className="w-full">
                     Sign Out
