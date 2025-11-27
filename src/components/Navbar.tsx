@@ -2,28 +2,55 @@ import { useState, useEffect } from "react";
 import { Menu, X, Mountain, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import {useCurrentUser} from "@/hooks/useAuth";
+//import { supabase } from "@/integrations/supabase/client";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState(null);
+  //const [user, setUser] = useState(null);
+  //const [userProfile, setUserProfile] = useState<{ display_name: string } | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-    });
+  const { data: userProfile, isLoading, isError } = useCurrentUser();
+  //const { user, isLoggedIn, isLoading } = useCurrentUser();
+  console.log("getuser");
+  console.log(userProfile?.displayName);
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
+  // useEffect(() => {
+  //   const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+  //     setUser(session?.user ?? null);
+  //     if (session?.user) {
+  //       fetchUserProfile(session.user.id);
+  //     } else {
+  //       setUserProfile(null);
+  //     }
+  //   });
 
-    return () => subscription.unsubscribe();
-  }, []);
+  //   supabase.auth.getSession().then(({ data: { session } }) => {
+  //     setUser(session?.user ?? null);
+  //     if (session?.user) {
+  //       fetchUserProfile(session.user.id);
+  //     }
+  //   });
 
+  //   return () => subscription.unsubscribe();
+  // }, []);
+  // const fetchUserProfile = async (userId: string) => {
+  //   const { data, error } = await supabase
+  //     .from("profiles")
+  //     .select("display_name")
+  //     .eq("user_id", userId)
+  //     .maybeSingle();
+
+  //   if (!error && data) {
+  //     setUserProfile(data);
+  //   }
+  // };
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    //await supabase.auth.signOut();
     navigate("/");
   };
 
@@ -61,10 +88,20 @@ const Navbar = () => {
             
             <ThemeToggle />
             
-            {user ? (
-              <Button onClick={handleSignOut} variant="outline" size="sm">
-                Sign Out
-              </Button>
+            {userProfile ? (
+               <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      {userProfile?.displayName?.[0]?.toUpperCase() || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm font-medium">{userProfile?.displayName || "User"}</span>
+                </div>
+                <Button onClick={handleSignOut} variant="outline" size="sm">
+                  Sign Out
+                </Button>
+              </div>
             ) : (
               <Link to="/auth">
                 <Button variant="outline" size="sm">
@@ -103,10 +140,20 @@ const Navbar = () => {
             <div className="pt-2 space-y-2">
               <ThemeToggle />
               
-              {user ? (
-                <Button onClick={handleSignOut} variant="outline" size="sm" className="w-full">
-                  Sign Out
-                </Button>
+              {userProfile ? (
+                <>
+                  <div className="flex items-center gap-2 py-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-primary/10 text-primary">
+                        {userProfile?.displayName?.[0]?.toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium">{userProfile?.displayName || "User"}</span>
+                  </div>
+                  <Button onClick={handleSignOut} variant="outline" size="sm" className="w-full">
+                    Sign Out
+                  </Button>
+                </>
               ) : (
                 <Link to="/auth">
                   <Button variant="outline" size="sm" className="w-full">
