@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-//import { supabase } from "@/integrations/supabase/client";
+import { AxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ import { Mountain } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/Navbar";
 import { signInSchema, SignInCredentials , signUpSchema , SignUpCredentials} from '@/components/api/authAPI'; // Schemat
-import { useAuthLoginMutation } from '@/hooks/useAuth'; // Nowy hook
+import { useAuthLoginMutation , useAuthRegisterMutation} from '@/hooks/useAuth'; // Nowy hook
 
 
 const Auth = () => {
@@ -22,12 +22,13 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const loginMutation = useAuthLoginMutation();
-
+  const registerMutation = useAuthRegisterMutation();
 
   const {  
-      register: registerSignup,
+      register: registerSignUp,
       handleSubmit: handleSubmitRegister,
-      formState: { errors: signupErrors },
+      setError: setErrorSignUp,
+      formState: { errors: signUpErrors },
     } = useForm<SignUpCredentials>({
       resolver: zodResolver(signUpSchema),
     });
@@ -35,7 +36,7 @@ const Auth = () => {
   const {
       register: registerSignIn,
       handleSubmit: handleSubmitLogin,
-      setError,
+      setError: setErrorSignIn,
       formState: { errors: signInErrors },
     } = useForm<SignInCredentials>({
       resolver: zodResolver(signInSchema),
@@ -43,71 +44,50 @@ const Auth = () => {
 
   const handleSignUp =  (data: SignUpCredentials) => {
       console.log("register");
-    try {
       
-      toast({
-        title: "Success!",
-        description: "Account created successfully. You can now log in.",
-      });
-    } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        toast({
-          variant: "destructive",
-          title: "Validation Error",
-          description: error.errors[0].message,
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Sign Up Failed",
-          description: error.message || "An error occurred during sign up",
-        });
-      }
-    } finally {
-      //setLoading(false);
-    }
+      registerMutation.mutate(data, {
+        onSuccess: () => {
+            // ✅ Użyj useNavigate do przekierowania
+            navigate("/"); 
+        },
+        onError: (error) => {
+            const serverMessage = extractErrorMessage(error);
+            setErrorSignUp("email", { 
+                type: "server", 
+                message: "Nieprawidłowy adres e-mail lub hasło." 
+            });
+            setErrorSignUp("password", { 
+                type: "server", 
+                message: serverMessage 
+            });
+        }
+    });     
+      
   };
 
   const handleSignIn =  (data: SignInCredentials) => {
     console.log("login");
-    try {
+    
       //const validatedData = authSchema.parse({ email, password });
 
       loginMutation.mutate(data, {
+        onSuccess: () => {
+            // ✅ Użyj useNavigate do przekierowania
+            navigate("/"); 
+        },
         onError: (error) => {
-            // Obsługa konkretnego błędu ze strony serwera
-            setError("email", { 
+             const serverMessage = extractErrorMessage(error);
+            setErrorSignIn("email", { 
                 type: "server", 
-                message: "Nieprawidłowy adres e-mail lub hasło." 
+                message: "Nieprawidłowy adres e-mail lub/i hasło." 
             });
-            setError("password", { 
+            setErrorSignIn("password", { 
                 type: "server", 
-                message: "Sprawdź swoje dane logowania." 
+                message: serverMessage 
             });
         }
     });     
-      console.log("logged");
-      toast({
-        title: "Welcome back!",
-        description: "Successfully logged in.",
-      });
-    } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        toast({
-          variant: "destructive",
-          title: "Validation Error",
-          description: error.errors[0].message,
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Login Failed",
-          description: error.message || "Invalid email or password",
-        });
-      }
-    } finally {
-      //setLoading(false);
-    }
+    
   };
 
   const handleSocialLogin = async (provider: 'google' | 'facebook') => {
@@ -128,6 +108,18 @@ const Auth = () => {
     //   });
     // }
   };
+  const extractErrorMessage = (error: unknown): string => {
+    // Sprawdzenie, czy to błąd Axios i czy ma ciało odpowiedzi
+    if (error && (error as AxiosError).response) {
+        const axiosError = error as AxiosError;
+        // Sprawdzenie, czy data zawiera obiekt wiadomości (standard w Twoich 401/400)
+        if (axiosError.response.data && (axiosError.response.data as any).message) {
+            return (axiosError.response.data as any).message;
+        }
+    }
+    // Zwrócenie ogólnego komunikatu, jeśli nie udało się odczytać
+    return "Wystąpił nieznany błąd serwera. Spróbuj ponownie.";
+};
 
   return (
     <>
@@ -244,17 +236,32 @@ const Auth = () => {
               </TabsContent>
               
               <TabsContent value="signup">
-                <form onSubmit={handleSubmitLogin(handleSignIn)} className="space-y-4">
+                <form onSubmit={handleSubmitRegister(handleSignUp)} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-name">Name</Label>
+                      <Input
+                        id="signup-name"
+                        type="text"
+                        placeholder="Your name"
+                        {...registerSignUp("name")}
+                        required
+                      />
+                      {signUpErrors.name && (
+                        <p className="text-red-500 text-sm">{signUpErrors.name.message}</p>
+                    )}
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
                     <Input
                       id="signup-email"
                       type="email"
                       placeholder="your@email.com"
-                      //value={email}
-                      //onChange={(e) => setEmail(e.target.value)}
+                      {...registerSignUp("email")}
                       required
                     />
+                    {signUpErrors.email && (
+                        <p className="text-red-500 text-sm">{signUpErrors.email.message}</p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">Password</Label>
@@ -262,10 +269,25 @@ const Auth = () => {
                       id="signup-password"
                       type="password"
                       placeholder="••••••••"
-                      //value={password}
-                      //onChange={(e) => setPassword(e.target.value)}
+                      {...registerSignUp("password")}
                       required
                     />
+                    {signUpErrors.password && (
+                        <p className="text-red-500 text-sm">{signUpErrors.password.message}</p>
+                    )}
+                  </div>
+                   <div className="space-y-2">
+                    <Label htmlFor="signup-confirm-password">Confirm Password</Label>
+                      <Input
+                        id="signup-confirm-password"
+                        type="password"
+                        placeholder="••••••••"
+                        {...registerSignUp("confirmPassword")}
+                        required
+                      />
+                      {signUpErrors.confirmPassword && (
+                        <p className="text-red-500 text-sm">{signUpErrors.confirmPassword.message}</p>
+                    )}
                   </div>
                   <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
                     {loginMutation.isPending ? "Creating account..." : "Sign Up"}
