@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { differenceInDays, parse } from "date-fns";
+import { useState, useEffect } from "react";
+import LoadingRunner from "@/components/LoadingRunner";
 
 const blogPosts = [
   {
@@ -56,6 +58,16 @@ const blogPosts = [
 ];
 
 const Blog = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading posts from database
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const isRecentPost = (dateString: string) => {
     try {
       const postDate = parse(dateString, "MMMM d, yyyy", new Date());
@@ -85,47 +97,51 @@ const Blog = () => {
       {/* Blog Posts Grid */}
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-6xl">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {blogPosts.map((post) => (
-              <Link key={post.id} to={`/blog/${post.id}`}>
-                <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 group h-full">
-                  <div className="relative h-48 overflow-hidden">
-                    <img 
-                      src={post.image} 
-                      alt={post.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute top-4 left-4 flex flex-wrap gap-2">
-                      {isRecentPost(post.date) && (
-                        <Badge className="bg-accent text-accent-foreground">
-                          New
-                        </Badge>
-                      )}
-                      {post.categories.map((category, index) => (
-                        <Badge key={index} className="bg-primary text-primary-foreground">
-                          {category}
-                        </Badge>
-                      ))}
+          {isLoading ? (
+            <LoadingRunner message="Loading posts..." />
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {blogPosts.map((post) => (
+                <Link key={post.id} to={`/blog/${post.id}`}>
+                  <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 group h-full">
+                    <div className="relative h-48 overflow-hidden">
+                      <img 
+                        src={post.image} 
+                        alt={post.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+                        {isRecentPost(post.date) && (
+                          <Badge className="bg-accent text-accent-foreground">
+                            New
+                          </Badge>
+                        )}
+                        {post.categories.map((category, index) => (
+                          <Badge key={index} className="bg-primary text-primary-foreground">
+                            {category}
+                          </Badge>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                  <CardHeader>
-                    <CardTitle className="text-xl hover:text-primary transition-colors">
-                      {post.title}
-                    </CardTitle>
-                    <CardDescription className="text-sm text-muted-foreground">
-                      {post.date}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-foreground/80">{post.excerpt}</p>
-                    <span className="mt-4 inline-block text-primary hover:text-primary/80 font-medium transition-colors">
-                      Read More →
-                    </span>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
+                    <CardHeader>
+                      <CardTitle className="text-xl hover:text-primary transition-colors">
+                        {post.title}
+                      </CardTitle>
+                      <CardDescription className="text-sm text-muted-foreground">
+                        {post.date}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-foreground/80">{post.excerpt}</p>
+                      <span className="mt-4 inline-block text-primary hover:text-primary/80 font-medium transition-colors">
+                        Read More →
+                      </span>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>
