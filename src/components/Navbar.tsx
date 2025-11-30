@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Menu, X, Mountain, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import {useCurrentUser} from "@/hooks/useAuth";
-//import { supabase } from "@/integrations/supabase/client";
+import {useAuthUser , useAuthLogoutMutation} from "@/hooks/useAuth";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
@@ -14,43 +13,14 @@ const Navbar = () => {
   //const [userProfile, setUserProfile] = useState<{ display_name: string } | null>(null);
   const navigate = useNavigate();
 
-  const { data: userProfile, isLoading, isError } = useCurrentUser();
-  //const { user, isLoggedIn, isLoading } = useCurrentUser();
-  console.log("getuser");
-  console.log(userProfile?.displayName);
+  //const { data: userProfile, isLoading, isError } = useCurrentUser();
+  const { data: userProfile } = useAuthUser();
+  const logoutMutation = useAuthLogoutMutation();
+  console.log("getuser: ", userProfile);
 
-  // useEffect(() => {
-  //   const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-  //     setUser(session?.user ?? null);
-  //     if (session?.user) {
-  //       fetchUserProfile(session.user.id);
-  //     } else {
-  //       setUserProfile(null);
-  //     }
-  //   });
 
-  //   supabase.auth.getSession().then(({ data: { session } }) => {
-  //     setUser(session?.user ?? null);
-  //     if (session?.user) {
-  //       fetchUserProfile(session.user.id);
-  //     }
-  //   });
-
-  //   return () => subscription.unsubscribe();
-  // }, []);
-  // const fetchUserProfile = async (userId: string) => {
-  //   const { data, error } = await supabase
-  //     .from("profiles")
-  //     .select("display_name")
-  //     .eq("user_id", userId)
-  //     .maybeSingle();
-
-  //   if (!error && data) {
-  //     setUserProfile(data);
-  //   }
-  // };
   const handleSignOut = async () => {
-    //await supabase.auth.signOut();
+    logoutMutation.mutate();
     navigate("/");
   };
 
