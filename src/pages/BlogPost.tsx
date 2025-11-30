@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
+import LoadingRunner from "@/components/LoadingRunner";
 
 const blogPosts = [
   {
@@ -121,6 +122,7 @@ const BlogPost = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isLoadingData, setIsLoadingData] = useState(true);
   
   // Combine hero image and gallery images
   const allImages = post ? [post.image, ...post.gallery] : [];
@@ -133,8 +135,10 @@ const BlogPost = () => {
 
   useEffect(() => {
     if (id) {
-      fetchLikes();
-      fetchComments();
+      setIsLoadingData(true);
+      Promise.all([fetchLikes(), fetchComments()]).finally(() => {
+        setIsLoadingData(false);
+      });
     }
   }, [id, user]);
 
@@ -316,19 +320,34 @@ const BlogPost = () => {
 
           {/* Likes Section */}
           <div className="flex items-center gap-4 py-6 mb-12 border-y border-border/50">
-            <button
-              onClick={handleLike}
-              className="group flex items-center gap-2 transition-all hover:scale-110"
-            >
-              <Heart
-                className={`w-7 h-7 transition-all ${
-                  isLiked
-                    ? "fill-red-500 text-red-500"
-                    : "text-muted-foreground group-hover:text-red-500"
-                }`}
-              />
-              <span className="text-sm font-medium">{likes} {likes === 1 ? 'like' : 'likes'}</span>
-            </button>
+            {isLoadingData ? (
+              <div className="animate-pulse flex items-center gap-2">
+                <div className="w-7 h-7 bg-muted rounded-full" />
+                <div className="w-16 h-4 bg-muted rounded" />
+              </div>
+            ) : (
+              <button
+                onClick={handleLike}
+                className={`group flex items-center gap-2 transition-all hover:scale-110 ${!user ? 'cursor-not-allowed opacity-70' : ''}`}
+                title={!user ? 'Login required to like' : (isLiked ? 'Unlike this post' : 'Like this post')}
+              >
+                <Heart
+                  className={`w-7 h-7 transition-all ${
+                    isLiked
+                      ? "fill-red-500 text-red-500"
+                      : user 
+                        ? "text-muted-foreground group-hover:text-red-500"
+                        : "text-muted-foreground/50"
+                  }`}
+                />
+                <span className="text-sm font-medium">{likes} {likes === 1 ? 'like' : 'likes'}</span>
+              </button>
+            )}
+            {!user && !isLoadingData && (
+              <span className="text-xs text-muted-foreground">
+                <Link to="/auth" className="text-primary hover:underline">Login</Link> to like
+              </span>
+            )}
           </div>
 
           {/* Main Content */}
@@ -387,7 +406,9 @@ const BlogPost = () => {
 
             {/* Comments List */}
             <div className="space-y-6">
-              {comments.length === 0 ? (
+              {isLoadingData ? (
+                <LoadingRunner message="Loading comments..." />
+              ) : comments.length === 0 ? (
                 <div className="text-center py-12 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl border border-border/50">
                   <p className="text-muted-foreground">
                     No comments yet. Be the first to comment!
