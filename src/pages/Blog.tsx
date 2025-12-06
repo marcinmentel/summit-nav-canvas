@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { usePostsQuery } from "@/hooks/usePosts";
 import { differenceInDays, format } from "date-fns";
+import LoadingRunner from "@/components/ui/LoadingRunner";
 const blogPosts = [
   {
     id: 1,
@@ -68,9 +69,7 @@ const Blog = () => {
   };
   if (isLoading)
     return (
-      <div className="min-h-screen flex justify-center items-center text-lg text-muted-foreground">
-        Loading blog posts...
-      </div>
+      <LoadingRunner message="Loading ... "/>
     );
 
   if (isError)

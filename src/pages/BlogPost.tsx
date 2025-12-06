@@ -8,240 +8,75 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
-import { usePostQuery , usePostSlugQuery} from "@/hooks/usePosts";
+import {useAuthUser } from "@/hooks/useAuth";
+import { usePostQuery , usePostSlugQuery , usePostsAddCommentMutation, usePostLikeMutations  } from "@/hooks/usePosts";
+import { CommentToSend , LikeDto} from "@/components/api/postAPI";
 import {  format } from "date-fns";
-const blogPosts = [
-  {
-    id: 1,
-    title: "Exploring the Alpine Peaks",
-    excerpt: "Discover the breathtaking beauty of mountain ranges and learn essential tips for your next alpine adventure.",
-    date: "March 15, 2024",
-    category: "Adventure",
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
-    content: `The Alpine peaks have captivated adventurers for centuries with their majestic beauty and challenging terrain. Standing atop these magnificent mountains offers a perspective that transforms how we see the world and ourselves.
-
-    In this comprehensive guide, we'll explore what makes alpine adventures so special and how you can prepare for your own journey into these breathtaking landscapes.`,
-    gallery: [
-      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80",
-      "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&q=80",
-      "https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=80"
-    ]
-  },
-  {
-    id: 2,
-    title: "Mountain Photography Guide",
-    excerpt: "Master the art of capturing stunning mountain landscapes with these professional photography techniques.",
-    date: "March 10, 2024",
-    category: "Photography",
-    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80",
-    content: `Capturing the perfect mountain photograph requires more than just pointing your camera at a beautiful view. It's about understanding light, composition, and the unique challenges that high-altitude environments present.
-
-    From golden hour magic to dramatic storm clouds, mountain photography offers endless opportunities for stunning imagery that tells a story.`,
-    gallery: [
-      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
-      "https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800&q=80",
-      "https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=80"
-    ]
-  },
-  {
-    id: 3,
-    title: "Best Hiking Trails for Beginners",
-    excerpt: "Start your hiking journey with these beginner-friendly trails that offer spectacular mountain views.",
-    date: "March 5, 2024",
-    category: "Hiking",
-    image: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=80",
-    content: `Starting your hiking journey doesn't mean you have to miss out on spectacular views. These carefully selected beginner trails offer the perfect introduction to mountain hiking while showcasing some of nature's most beautiful landscapes.
-
-    Each trail has been chosen for its accessibility, safety features, and rewarding views that will inspire you to continue your hiking adventures.`,
-    gallery: [
-      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80",
-      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
-      "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&q=80"
-    ]
-  },
-  {
-    id: 4,
-    title: "Sustainable Mountain Tourism",
-    excerpt: "Learn how to explore mountains responsibly and minimize your environmental impact.",
-    date: "February 28, 2024",
-    category: "Environment",
-    image: "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&q=80",
-    content: `Our mountains are precious ecosystems that require careful stewardship. Sustainable mountain tourism isn't just a trend—it's a responsibility we all share to preserve these natural wonders for future generations.
-
-    By following simple guidelines and making conscious choices, every visitor can contribute to protecting the fragile alpine environment while still enjoying incredible experiences.`,
-    gallery: [
-      "https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=80",
-      "https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800&q=80",
-      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80"
-    ]
-  },
-  {
-    id: 5,
-    title: "Winter Mountain Safety Tips",
-    excerpt: "Essential safety guidelines for winter mountain adventures and cold weather hiking.",
-    date: "February 20, 2024",
-    category: "Safety",
-    image: "https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800&q=80",
-    content: `Winter transforms mountains into pristine wonderlands, but these beautiful conditions come with serious challenges that demand respect and preparation. Understanding winter mountain safety is crucial for anyone venturing into snowy alpine environments.
-
-    From avalanche awareness to proper layering techniques, this guide covers the essential knowledge you need to stay safe while enjoying winter mountain adventures.`,
-    gallery: [
-      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
-      "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&q=80",
-      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80"
-    ]
-  },
-  {
-    id: 6,
-    title: "Mountain Wellness Retreats",
-    excerpt: "Rejuvenate your mind and body with peaceful mountain retreats focused on wellness and tranquility.",
-    date: "February 15, 2024",
-    category: "Wellness",
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
-    content: `In our fast-paced world, mountain wellness retreats offer a sanctuary for restoration and self-discovery. The combination of fresh alpine air, serene landscapes, and mindful practices creates the perfect environment for deep relaxation and renewal.
-
-    These retreats blend the healing power of nature with expert guidance in wellness practices, offering a transformative experience that stays with you long after you return to daily life.`,
-    gallery: [
-      "https://poweredazureblob.blob.core.windows.net/photocontainer/IMG_2012_800x600.jpeg",
-      "https://poweredazureblob.blob.core.windows.net/photocontainer/IMG_5233_800x600.jpeg",
-      "https://poweredazureblob.blob.core.windows.net/photocontainer/IMG_4325_800x600.jpeg",
-      "https://poweredazureblob.blob.core.windows.net/photocontainer/IMG_5184_800x600.jpeg",
-      "https://poweredazureblob.blob.core.windows.net/photocontainer/IMG_1971_800x600.jpeg",
-      "https://poweredazureblob.blob.core.windows.net/photocontainer/IMG_2273_800x600.jpeg",
-      "https://poweredazureblob.blob.core.windows.net/photocontainer/IMG_5265_800x600.jpeg"
-    ]
-  }
-];
 
 const BlogPost = () => {
   const { slug } = useParams();
   const { id } = useParams();// nie uzywane. tylko dla like, comment
-  //const post = blogPosts.find((p) => p.id === Number(id));
+
+  const addCommentMutation = usePostsAddCommentMutation();
   const { data: post, isLoading, isError } = usePostSlugQuery(String(slug));
   console.log('onepost: ', post);
 
-  const { toast } = useToast();
-  
-  const [user, setUser] = useState<any>(null);
-  const [likes, setLikes] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
-  const [comments, setComments] = useState<any[]>([]);
+  const { data: userProfile } = useAuthUser();
   const [newComment, setNewComment] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
-  // Combine hero image and gallery images
- // const allImages = post ? [post.image, ...post.gallery] : [];
   const allImages = post ? [post.featuredImage, ...post.galleryImages] : [];
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-    });
-  }, []);
+  const currentUserId = userProfile?.userName;
+  const { addLikeMutation, removeLikeMutation } = usePostLikeMutations(
+        String(slug), 
+        post?.id || 0, 
+        currentUserId
+    );
 
-  useEffect(() => {
-    if (id) {
-      fetchLikes();
-      fetchComments();
-    }
-  }, [id, user]);
-
-  const fetchLikes = async () => {
-    const { count } = await supabase
-      .from("post_likes")
-      .select("*", { count: "exact", head: true })
-      .eq("post_id", id);
-    
-    setLikes(count || 0);
-
-    if (user) {
-      const { data } = await supabase
-        .from("post_likes")
-        .select("id")
-        .eq("post_id", id)
-        .eq("user_id", user.id)
-        .maybeSingle();
-      
-      setIsLiked(!!data);
-    }
-  };
-
-  const fetchComments = async () => {
-    const { data } = await supabase
-      .from("post_comments")
-      .select("*")
-      .eq("post_id", id)
-      .order("created_at", { ascending: false });
-    
-    setComments(data || []);
-  };
+  const likesCount = post?.likes?.length || 0;
+  const isLiked = post?.likes?.some(l => l.userId === currentUserId) || false;
+  //console.log("currentUserId",post?.likes[0]?.userId);  
+  console.log("isLiked",isLiked);
+  
 
   const handleLike = async () => {
-    if (!user) {
-      toast({
-        title: "Login required",
-        description: "Please login to like posts",
-        variant: "destructive",
-      });
-      return;
-    }
+        if (!userProfile || !post?.id) { /* toast i return */ return; }
 
-    if (isLiked) {
-      await supabase
-        .from("post_likes")
-        .delete()
-        .eq("post_id", id)
-        .eq("user_id", user.id);
-      setIsLiked(false);
-      setLikes(likes - 1);
-    } else {
-      await supabase
-        .from("post_likes")
-        .insert({ post_id: id, user_id: user.id });
-      setIsLiked(true);
-      setLikes(likes + 1);
-    }
-  };
+        const likeData: LikeDto = {
+            postId: post.id,
+            userId:userProfile.userName
+
+        }  
+
+        if (isLiked) {
+            removeLikeMutation.mutate(likeData);
+        } else {
+            addLikeMutation.mutate(likeData);
+        }
+    };
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!user) {
-      toast({
-        title: "Login required",
-        description: "Please login to comment",
-        variant: "destructive",
-      });
-      return;
-    }
+    console.log("post: ",post);
+    if (!post.id || !newComment.trim()) return; 
 
-    if (!newComment.trim()) return;
-
-    setIsSubmitting(true);
-    const { error } = await supabase
-      .from("post_comments")
-      .insert({
-        post_id: id,
-        user_id: user.id,
+    const commentData: CommentToSend = {
+        // 💡 Zakładamy, że userProfile ma pole ID, którego używamy jako authorId
+        authorId: userProfile.userName, // Dostosuj do struktury Twojego userProfile!
         content: newComment.trim(),
-      });
+        postId: post.id,
+    };
 
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to post comment",
-        variant: "destructive",
-      });
-    } else {
-      setNewComment("");
-      fetchComments();
-      toast({
-        title: "Success",
-        description: "Comment posted successfully",
-      });
-    }
-    setIsSubmitting(false);
+    // Wywołaj mutację
+    addCommentMutation.mutate(commentData, {
+        onSuccess: () => {
+            // Wyczyść pole po udanej mutacji (toast jest obsługiwany w hooku)
+            setNewComment(""); 
+        }
+        // onError jest obsługiwany w hooku
+    });
+   
   };
 
   const openLightbox = (index: number) => {
@@ -337,19 +172,34 @@ const BlogPost = () => {
 
           {/* Likes Section */}
           <div className="flex items-center gap-4 py-6 mb-12 border-y border-border/50">
-            <button
-              onClick={handleLike}
-              className="group flex items-center gap-2 transition-all hover:scale-110"
-            >
-              <Heart
-                className={`w-7 h-7 transition-all ${
-                  isLiked
-                    ? "fill-red-500 text-red-500"
-                    : "text-muted-foreground group-hover:text-red-500"
-                }`}
-              />
-              <span className="text-sm font-medium">{likes} {likes === 1 ? 'like' : 'likes'}</span>
-            </button>
+            {isLoading ? (
+              <div className="animate-pulse flex items-center gap-2">
+                <div className="w-7 h-7 bg-muted rounded-full" />
+                <div className="w-16 h-4 bg-muted rounded" />
+              </div>
+            ) : (
+              <button
+                onClick={handleLike}
+                className={`group flex items-center gap-2 transition-all hover:scale-110 ${!userProfile ? 'cursor-not-allowed opacity-70' : ''}`}
+                title={!userProfile ? 'Login required to like' : (isLiked ? 'Unlike this post' : 'Like this post')}
+              >
+                <Heart
+                  className={`w-7 h-7 transition-all ${
+                    isLiked
+                      ? "fill-red-500 text-red-500"
+                      : userProfile 
+                        ? "text-muted-foreground group-hover:text-red-500"
+                        : "text-muted-foreground/50"
+                  }`}
+                />
+                <span className="text-sm font-medium">{likesCount} {likesCount === 1 ? 'like' : 'likes'}</span>
+              </button>
+            )}
+            {!userProfile && !isLoading && (
+              <span className="text-xs text-muted-foreground">
+                <Link to="/auth" className="text-primary hover:underline">Login</Link> to like
+              </span>
+            )}
           </div>
 
           {/* Main Content */}
@@ -391,15 +241,15 @@ const BlogPost = () => {
               <Textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder={user ? "Write a comment..." : "Login to comment"}
-                disabled={!user || isSubmitting}
+                placeholder={userProfile ? "Write a comment..." : "Login to comment"}
+                disabled={!userProfile }
                 className="min-h-[120px] resize-none"
               />
-              <Button type="submit" disabled={!user || isSubmitting || !newComment.trim()} className="gap-2">
+              <Button type="submit" disabled={!userProfile } className="gap-2">
                 <Send className="w-4 h-4" />
                 Post Comment
               </Button>
-              {!user && (
+              {!userProfile && (
                 <p className="text-sm text-muted-foreground">
                   Please <Link to="/auth" className="text-primary hover:underline">login</Link> to leave a comment
                 </p>
@@ -408,29 +258,31 @@ const BlogPost = () => {
 
             {/* Comments List */}
             <div className="space-y-6">
-              {comments.length === 0 ? (
+              {post.comments.length === 0 ? (
                 <div className="text-center py-12 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl border border-border/50">
                   <p className="text-muted-foreground">
                     No comments yet. Be the first to comment!
                   </p>
                 </div>
               ) : (
-                comments.map((comment) => (
+                post.comments.map((comment) => (
                   <div
-                    key={comment.id}
+                    key={comment.createdAt}
                     className="bg-gradient-to-r from-primary/5 to-transparent p-6 rounded-xl border border-primary/10 hover:border-primary/20 transition-colors"
                   >
                     <div className="flex items-start gap-4">
                       <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                         <span className="text-sm font-semibold text-primary">
-                          {comment.user_id.substring(0, 2).toUpperCase()}
+                          {comment.authorId.substring(0, 2).toUpperCase()}
                         </span>
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="font-semibold text-sm text-foreground">Anonymous User</span>
+                          <span className="font-semibold text-sm text-foreground">
+                            {comment.authorId}
+                          </span>
                           <span className="text-xs text-muted-foreground">
-                            {new Date(comment.created_at).toLocaleDateString('en-US', {
+                            {new Date(comment.createdAt).toLocaleDateString('en-US', {
                               year: 'numeric',
                               month: 'short',
                               day: 'numeric'
