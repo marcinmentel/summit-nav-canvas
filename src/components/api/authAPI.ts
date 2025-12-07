@@ -51,7 +51,7 @@ export const authLogin = async (credentials: SignInCredentials): Promise<UserPro
   return res.data;
 };
  
-export const authRegister = async (credentials: SignUpCredentials): Promise<void> => {
+export const authRegister = async (credentials: SignUpCredentials): Promise<void> => {// dodac UserProfile
   const res = await apiClient.post("/api/auth/register",credentials);
   return res.data;
 };
