@@ -66,7 +66,7 @@ const Navbar = () => {
                       {userProfile?.displayName?.[0]?.toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="text-sm font-medium">{userProfile?.displayName || "User"}</span>
+                  <span className="text-sm font-medium">{userProfile?.userName || "User"}</span>
                 </div>
                 <Button onClick={handleSignOut} variant="outline" size="sm">
                   Sign Out

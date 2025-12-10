@@ -14,7 +14,7 @@ import { Mountain } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/Navbar";
 import { signInSchema, SignInCredentials , signUpSchema , SignUpCredentials} from '@/components/api/authAPI'; // Schemat
-import { useAuthLoginMutation , useAuthRegisterMutation} from '@/hooks/useAuth'; // Nowy hook
+import { useAuthLoginMutation , useAuthRegisterMutation , useAuthLoginWithGoogle} from '@/hooks/useAuth'; // Nowy hook
 
 
 const Auth = () => {
@@ -23,7 +23,7 @@ const Auth = () => {
   const { toast } = useToast();
   const loginMutation = useAuthLoginMutation();
   const registerMutation = useAuthRegisterMutation();
-
+  const loginWithGoogleMutation = useAuthLoginWithGoogle();
   const {  
       register: registerSignUp,
       handleSubmit: handleSubmitRegister,
@@ -91,22 +91,17 @@ const Auth = () => {
   };
 
   const handleSocialLogin = async (provider: 'google' | 'facebook') => {
-    // try {
-    //   // const { error } = await supabase.auth.signInWithOAuth({
-    //   //   provider,
-    //   //   options: {
-    //   //     redirectTo: `${window.location.origin}/`,
-    //   //   },
-    //   // });
-
-    //   //if (error) throw error;
-    // } catch (error: any) {
-    //   toast({
-    //     variant: "destructive",
-    //     title: "Login Failed",
-    //     description: error.message || `Failed to login with ${provider}`,
-    //   });
-    // }
+    window.location.href = "https://localhost:7007/api/auth/login/google?returnUrl=http://localhost:8080";
+   
+    // loginWithGoogleMutation.mutate(undefined, {
+    //     onSuccess: () => {
+    //         // ✅ Użyj useNavigate do przekierowania
+    //         console.log("GoogleLoginOK")
+    //     },
+    //     onError: (error) => {
+    //         console.log("GoogleLoginNOK",error)
+    //     }
+    // }); 
   };
   const extractErrorMessage = (error: unknown): string => {
     // Sprawdzenie, czy to błąd Axios i czy ma ciało odpowiedzi
