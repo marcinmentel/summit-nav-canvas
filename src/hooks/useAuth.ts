@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient , useQuery} from "@tanstack/react-query";
-import { authLogin, SignInCredentials,authLogout , getCurrentUser ,authRegister , SignUpCredentials , UserProfile} from "@/components/api/authAPI";
+import { authLogin, SignInCredentials,authLogout , getCurrentUser ,authRegister , SignUpCredentials , UserProfile, authLoginWithGoogle} from "@/components/api/authAPI";
 import { useToast } from "@/hooks/use-toast";
 
 export const useAuthLoginMutation = () => {
@@ -122,4 +122,18 @@ export const useAuthUser = () => {
             }
         },
     });
-}
+};
+
+export const useAuthLoginWithGoogle = () => {
+
+    return useMutation ({
+        mutationFn: authLoginWithGoogle,
+        onSuccess: () => {
+            console.log("useAuthGoogleOK");
+        },
+        onError: (error ) => {
+            console.log("useAuthGoogle",error);
+
+        },
+    });
+};
