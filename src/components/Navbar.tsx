@@ -1,11 +1,17 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Mountain, User } from "lucide-react";
+import { Menu, X, Mountain, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState(null);
@@ -81,19 +87,31 @@ const Navbar = () => {
             <ThemeToggle />
             
             {user ? (
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-primary/10 text-primary">
-                      {userProfile?.display_name?.[0]?.toUpperCase() || "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm font-medium">{userProfile?.display_name || "User"}</span>
-                </div>
-                <Button onClick={handleSignOut} variant="outline" size="sm">
-                  Sign Out
-                </Button>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-primary/10 text-primary">
+                        {userProfile?.display_name?.[0]?.toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium">{userProfile?.display_name || "User"}</span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="cursor-pointer">
+                      <User className="h-4 w-4 mr-2" />
+                      Profile Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Link to="/auth">
                 <Button variant="outline" size="sm">
@@ -134,15 +152,20 @@ const Navbar = () => {
               
               {user ? (
                 <>
-                  <div className="flex items-center gap-2 py-2">
+                  <Link 
+                    to="/profile" 
+                    className="flex items-center gap-2 py-2 hover:opacity-80 transition-opacity"
+                    onClick={() => setIsOpen(false)}
+                  >
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="bg-primary/10 text-primary">
                         {userProfile?.display_name?.[0]?.toUpperCase() || "U"}
                       </AvatarFallback>
                     </Avatar>
                     <span className="text-sm font-medium">{userProfile?.display_name || "User"}</span>
-                  </div>
+                  </Link>
                   <Button onClick={handleSignOut} variant="outline" size="sm" className="w-full">
+                    <LogOut className="h-4 w-4 mr-2" />
                     Sign Out
                   </Button>
                 </>
