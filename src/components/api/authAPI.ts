@@ -42,7 +42,8 @@ export interface UserProfile {
     displayName : string,
     userName: string,
     email: string,
-    role: string
+    role: string,
+    loginProvider: string
 } 
 
 
@@ -66,7 +67,3 @@ export const authLogout = async ( ): Promise<void> => {
   return res.data;
 };
 
-export const authLoginWithGoogle = async ( ): Promise<void> => {
-  const res = await apiClient.get("/api/auth/login/google?returnUrl=http://localhost:8080");
-  return res.data;
-};

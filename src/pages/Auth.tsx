@@ -14,7 +14,7 @@ import { Mountain } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/Navbar";
 import { signInSchema, SignInCredentials , signUpSchema , SignUpCredentials} from '@/components/api/authAPI'; // Schemat
-import { useAuthLoginMutation , useAuthRegisterMutation , useAuthLoginWithGoogle} from '@/hooks/useAuth'; // Nowy hook
+import { useAuthLoginMutation , useAuthRegisterMutation } from '@/hooks/useAuth'; // Nowy hook
 
 
 const Auth = () => {
@@ -23,7 +23,6 @@ const Auth = () => {
   const { toast } = useToast();
   const loginMutation = useAuthLoginMutation();
   const registerMutation = useAuthRegisterMutation();
-  const loginWithGoogleMutation = useAuthLoginWithGoogle();
   const {  
       register: registerSignUp,
       handleSubmit: handleSubmitRegister,
