@@ -67,7 +67,8 @@ export const authLogout = async ( ): Promise<void> => {
   return res.data;
 };
 
-export const authLoginWithGoogle = async ( ): Promise<void> => {
-  const res = await apiClient.get("/api/auth/login/google?returnUrl=http://localhost:8080");
+export const updateDiplayName = async ( displayName: string  ): Promise<void> => {
+  const res = await apiClient.post("/api/auth/updateDisplayname",displayName);
   return res.data;
 };
+

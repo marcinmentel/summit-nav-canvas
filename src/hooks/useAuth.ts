@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient , useQuery} from "@tanstack/react-query";
-import { authLogin, SignInCredentials,authLogout , getCurrentUser ,authRegister , SignUpCredentials , UserProfile, authLoginWithGoogle} from "@/components/api/authAPI";
+import { authLogin, SignInCredentials,authLogout , getCurrentUser ,authRegister , SignUpCredentials , UserProfile , updateDiplayName} from "@/components/api/authAPI";
 import { useToast } from "@/hooks/use-toast";
 
 export const useAuthLoginMutation = () => {
@@ -124,16 +124,27 @@ export const useAuthUser = () => {
     });
 };
 
-export const useAuthLoginWithGoogle = () => {
 
-    return useMutation ({
-        mutationFn: authLoginWithGoogle,
-        onSuccess: () => {
-            console.log("useAuthGoogleOK");
+export const useAuthUpdateDiplayName = () => {
+    const queryClient = useQueryClient();
+    const { toast } = useToast();
+    return useMutation({
+        // Funkcja do wykonania mutacji
+        
+        mutationFn: (displayName: string) => updateDiplayName(displayName),
+        
+        
+        onSuccess: (data, variables, context) => {
+            // Logowanie się powiodło.
+            console.log("DisplayName aktualny");
+            
+            queryClient.removeQueries({ queryKey: ['userProfile'] }); 
         },
-        onError: (error ) => {
-            console.log("useAuthGoogle",error);
-
+        
+        onError: (error, variables, context) => {
+            // Obsługa błędów logowania (np. złe hasło)
+            console.error("Błąd rejestracji:", error);
+            // Błąd zostanie obsłużony w komponencie
         },
     });
 };

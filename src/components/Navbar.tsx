@@ -31,7 +31,7 @@ const Navbar = () => {
   };
 
   const navLinks = [
-    { name: "Home", href: "/" },
+    //{ name: "Home", href: "/" },
     { name: "Blog", href: "/blog" },
   ];
 
@@ -40,16 +40,21 @@ const Navbar = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center gap-2">
-            <img
-              src= "https://poweredbytrailstorage.blob.core.windows.net/pbtgallery/ICON300.png"
-              alt="PBT icon"
-              className="h-8 w-8" />
-             <span className="text-xl font-bold bg-gradient-to-r from-trail-green via-trail-brown to-trail-blue bg-clip-text  text-transparent">
-                Powered By Trail
-              </span>
-          </div>
-
+          <Link
+            key={"Home"}
+            to={"/"}
+          
+          >
+            <div className="flex items-center gap-2">
+              <img
+                src= "https://poweredbytrailstorage.blob.core.windows.net/pbtgallery/ICON300.png"
+                alt="PBT icon"
+                className="h-8 w-8" />
+              <span className="text-xl font-bold bg-gradient-to-r from-trail-green via-trail-brown to-trail-blue bg-clip-text  text-transparent">
+                  Powered By Trail
+                </span>
+            </div>
+          </Link>
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-4">
             {navLinks.map((link) => (
