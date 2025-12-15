@@ -67,3 +67,8 @@ export const authLogout = async ( ): Promise<void> => {
   return res.data;
 };
 
+export const updateDiplayName = async ( displayName: string  ): Promise<void> => {
+  const res = await apiClient.post("/api/auth/updateDisplayname",displayName);
+  return res.data;
+};
+
