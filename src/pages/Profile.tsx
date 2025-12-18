@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { User, Mail, KeyRound, Save } from "lucide-react";
-import {useAuthUser, useAuthUpdateDiplayName  } from "@/hooks/useAuth";
+import {useAuthUser, useAuthUpdateDiplayName , useAuthForgotPassword } from "@/hooks/useAuth";
 
 
 
@@ -22,6 +22,7 @@ const Profile = () => {
  const { toast } = useToast();
  const { data: userProfile } = useAuthUser();
  const updateDisplayNameMutation = useAuthUpdateDiplayName();
+ const useAuthForgotPasswordMutation = useAuthForgotPassword();
  const isGoogleUser = userProfile?.loginProvider == "Google" ? true : false;
  const [displayName, setDisplayName] = useState("");
  useEffect(() => {
@@ -73,27 +74,30 @@ const Profile = () => {
   };
 
   const handleResetPassword = async () => {
-    // if (!user?.email) return;
+
+      useAuthForgotPasswordMutation.mutate(userProfile.email, {
+        onSuccess: () => {
+            // Toast o sukcesie jest już obsłużony w useAuthUpdateDiplayName
+            // ale możesz go dodać tutaj, jeśli chcesz.
+             toast({
+                title: "Success",
+                description: "Mail has been sent",
+            });
+        },
+        onError: (error) => {
+            // Obsługa błędów, jeśli nie jest obsłużona w useAuthUpdateDiplayName
+            console.error("Błąd wysyłki maila:", error);
+            toast({
+                title: "Error",
+                description: "Failed to send mail",
+                variant: "destructive",
+            });
+        },
+    });
+
+
+
     
-    // setIsPasswordLoading(true);
-    // const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
-    //   redirectTo: `${window.location.origin}/auth`,
-    // });
-
-    // setIsPasswordLoading(false);
-
-    // if (error) {
-    //   toast({
-    //     title: "Error",
-    //     description: "Failed to send reset email. Please try again.",
-    //     variant: "destructive",
-    //   });
-    // } else {
-    //   toast({
-    //     title: "Email Sent",
-    //     description: "Check your inbox for the password reset link.",
-    //   });
-    // }
   };
 
   if (!userProfile) {

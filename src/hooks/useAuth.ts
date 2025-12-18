@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient , useQuery} from "@tanstack/react-query";
-import { authLogin, SignInCredentials,authLogout , getCurrentUser ,authRegister , SignUpCredentials , UserProfile , updateDiplayName} from "@/components/api/authAPI";
+import { authLogin, SignInCredentials,authLogout , getCurrentUser ,authRegister , SignUpCredentials ,
+     UserProfile , updateDiplayName, forgotPassword, resetPassword, ResetPasswordPayload} from "@/components/api/authAPI";
 import { useToast } from "@/hooks/use-toast";
 
 export const useAuthLoginMutation = () => {
@@ -145,6 +146,62 @@ export const useAuthUpdateDiplayName = () => {
             // Obsługa błędów logowania (np. złe hasło)
             console.error("Błąd rejestracji:", error);
             // Błąd zostanie obsłużony w komponencie
+        },
+    });
+};
+
+
+export const useAuthForgotPassword = () => {
+    const queryClient = useQueryClient();
+    const { toast } = useToast();
+    return useMutation({
+        // Funkcja do wykonania mutacji
+        
+        mutationFn: (email: string) => forgotPassword(email),
+        
+        
+        onSuccess: (data, variables, context) => {
+            // Logowanie się powiodło.
+            console.log("Mail wysłany");
+            
+        },
+        
+        onError: (error, variables, context) => {
+            // Obsługa błędów logowania (np. złe hasło)
+            console.error("Błąd wysyłki maila:", error);
+            // Błąd zostanie obsłużony w komponencie
+        },
+    });
+};
+
+export const useAuthConfirmResetPassword = () => {
+    const queryClient = useQueryClient();
+    const { toast } = useToast();
+    return useMutation({
+        // Payload zawiera email, token i newPassword
+        mutationFn: (payload: ResetPasswordPayload) => resetPassword(payload),
+        
+        onSuccess: () => {
+            console.log("Hasło zresetowane pomyślnie");
+            queryClient.removeQueries({ queryKey: ['userProfile'] }); 
+             toast({
+                title: "Success",
+                description: "Hasło zostało zmienione, możesz się zalogować.",
+            });
+        },
+        
+        onError: (error: any) => {
+            // Obsługa błędów, np. nieprawidłowy token
+            console.error("Błąd resetowania hasła:", error);
+            
+            // W zależności od struktury błędu z serwera ASP.NET
+            const errorMessage = error?.response?.data?.message || "Failed to reset password. Token might be invalid or expired.";
+            
+            toast({
+                title: "Error",
+                description: errorMessage,
+                variant: "destructive",
+            });
         },
     });
 };

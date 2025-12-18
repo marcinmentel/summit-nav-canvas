@@ -45,7 +45,11 @@ export interface UserProfile {
     role: string,
     loginProvider: string
 } 
-
+export interface ResetPasswordPayload {
+    email: string;
+    token: string;
+    newPassword: string;
+}
 
 export const authLogin = async (credentials: SignInCredentials): Promise<UserProfile> => {
   const res = await apiClient.post("/api/auth/login",credentials);
@@ -71,4 +75,12 @@ export const updateDiplayName = async ( displayName: string  ): Promise<void> =>
   const res = await apiClient.post("/api/auth/updateDisplayname",displayName);
   return res.data;
 };
+export const forgotPassword = async ( email: string  ): Promise<void> => {
+  const res = await apiClient.post("/api/auth/forgot-password",email);
+  return res.data;
+};
 
+export const resetPassword = async ( payload: ResetPasswordPayload ): Promise<void> => {
+  const res = await apiClient.post("/api/auth/reset-password",payload);
+  return res.data;
+};

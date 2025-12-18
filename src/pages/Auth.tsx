@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { AxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
 import { Button } from "@/components/ui/button";
@@ -162,7 +162,12 @@ const Auth = () => {
                     )}
                   </div>
                   <div className="space-y-2">
+                    <div className="flex items-center justify-between">
                     <Label htmlFor="login-password">Password</Label>
+                    <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                      Forgot password?
+                    </Link>
+                  </div>
                     <Input
                       id="login-password"
                       type="password"
