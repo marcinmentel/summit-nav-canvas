@@ -9,7 +9,8 @@ import BlogPost from "./pages/BlogPost";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
-
+import ResetPassword from "./pages/ResetPassword";
+import ForgotPassword from "./pages/ForgotPassword";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -25,6 +26,8 @@ const App = () => (
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/profile" element={<Profile/>}></Route>
+          <Route path="/reset-password" element={<ResetPassword/>}></Route>
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
