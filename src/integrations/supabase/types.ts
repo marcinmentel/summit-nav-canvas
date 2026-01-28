@@ -59,6 +59,54 @@ export type Database = {
         }
         Relationships: []
       }
+      posts: {
+        Row: {
+          categories: string[] | null
+          content: Json
+          created_at: string
+          excerpt: string
+          id: string
+          image: string | null
+          location: string | null
+          published: boolean | null
+          read_time: string | null
+          subtitle: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          categories?: string[] | null
+          content?: Json
+          created_at?: string
+          excerpt: string
+          id?: string
+          image?: string | null
+          location?: string | null
+          published?: boolean | null
+          read_time?: string | null
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          categories?: string[] | null
+          content?: Json
+          created_at?: string
+          excerpt?: string
+          id?: string
+          image?: string | null
+          location?: string | null
+          published?: boolean | null
+          read_time?: string | null
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
